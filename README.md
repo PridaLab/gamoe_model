@@ -74,15 +74,21 @@ gamoe_model/
 ├── docs/
 │   └── images/                 # Embedded README figures
 └── requirements.txt
+```
 
+---
 ## Citation
 
 If you use this codebase or model in your research, please cite:
 
 ```bibtex
 @software{gamoe_model2026,
-  author = {Authors},
-  title = {title},
+  author = {Teresa Jurado-Parras#, Melisa Maidana-Capitan#, Candela Sanchez-Bellot*, Eloy Parra-Barrero*, Elena Cid, Enrique R. Sebastian, and Liset M. de la Prida},
+  title = {Cell-type-resolved microcircuit dissection reveals inhibitory modules underlying ripple variability},
   url = {[https://github.com/PridaLab/gamoe_model](https://github.com/PridaLab/gamoe_model)},
   year = {2026}
 }
+```
+
+---
+## Licence 
