@@ -10,7 +10,7 @@ from configs.ablation_config import (
     FULL_FEATS, ABLATION_CONDS, GAMOE_ABLAT_MODES, SPLIT_ROOT, GAMOE_OUT_ROOT
 )
 from src.models.moe import GatedMoE, eval_gamoe_ablations
-from src.geometry.prior import build_prior
+from src.geometry.priors import build_prior
 from src.utils.data_loaders import load_single_cov_vector
 from src.utils.metrics import compute_error_weighted_covariates
 
