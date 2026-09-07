@@ -74,3 +74,15 @@ gamoe_model/
 ├── docs/
 │   └── images/                 # Embedded README figures
 └── requirements.txt
+
+## Citation
+
+If you use this codebase or model in your research, please cite:
+
+```bibtex
+@software{gamoe_model2026,
+  author = {Authors},
+  title = {title},
+  url = {[https://github.com/PridaLab/gamoe_model](https://github.com/PridaLab/gamoe_model)},
+  year = {2026}
+}
