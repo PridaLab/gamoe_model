@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+experiments_filt_ripples/
+*.mat
+*.csv
+*.png
+*.svg
+.ipynb_checkpoints/
