@@ -28,9 +28,6 @@ where $g_j(U) \propto \mathcal{N}(U; \mu_j, \Sigma_j)^\alpha$ and $\sum_j g_j(U)
 ### 1. Spatial Structure Index (SI)
 Quantifies whether raw feature activations, gating probabilities, or prediction errors exhibit localized topological organization across the latent manifold.
 
-#<p align="center">
-#  <img src="docs/images/manifold_weights_si.png" alt="Latent Space Colored by Cell Weights and SI" width="90%" />
-#</p>
 
 ### 2. Dual-Mode Systematic Ablations
 The framework benchmarks network degradation using complementary ablation modalities:
@@ -38,19 +35,11 @@ The framework benchmarks network degradation using complementary ablation modali
 * **Gate Shuffling (`shuffle`)**: Randomly permutes $g_j$ across samples to evaluate dependency on manifold geometry while preserving marginal activation distributions.
 * **Input Zeroing (`input`)**: Directly masks standardized inputs $x_j = 0$.
 
-#<p align="center">
-#  <img src="docs/images/r2_ablation_summary.png" alt="R2 Summary Across Ablations" width="85%" />
-#</p>
-
 ### 3. Spatial Residual Error Maps
 Identifies local coordinate patches of the manifold that degrade when specific cell assemblies or cortical depths are perturbed.
 
-#<p align="center">
-#  <img src="docs/images/umap_error_projection.png" alt="Manifold Error Projection Maps" width="85%" />
-#</p>
 
 ---
-
 ## 📁 Repository Structure
 
 ```text
