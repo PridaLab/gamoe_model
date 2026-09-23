@@ -14,7 +14,7 @@ A modular implementation of **Geometry-Aware Mixture of Experts (GAMoE)** for ma
 GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target manifold coordinates:
 
 <p align="center">
-  <img src="gamoe_computational_graph.png" alt="GAMoE Computational Graph" width="85%" />
+  <img src="gamoe_ilustration.png" alt="GAMoE Computational Graph" width="85%" />
 </p>
 
 $$\hat{\mathbf{u}}_i = \sum_{j=1}^{N} g_j(\mathbf{u}_i) \cdot f_j(x_{ij})$$
