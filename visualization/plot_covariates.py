@@ -28,7 +28,53 @@ def plot_weighted_covariates():
                 sns.boxplot(data=sw, x="feature_set", y="weighted_mean", ax=axes[idx], showfliers=False)
                 axes[idx].set_title(f"Error-weighted {feat} ({mode}) — {inp}")
                 axes[idx].set_xticklabels(axes[idx].get_xticklabels(), rotation=45, ha="right")
+                / home / melisamc / Documents / cell_types_characteristics / data / cell_curves.csv
+                Traceback(most
+                recent
+                call
+                last):
+                File
+                "/home/melisamc/anaconda3/envs/myenv/lib/python3.11/site-packages/IPython/core/interactiveshell.py", line
+                3701, in run_code
+                exec(code_obj, self.user_global_ns, self.user_ns)
+            File
+            "<ipython-input-3-5a18bed75887>", line
+            996, in < module >
+            main()
+        File
+        "<ipython-input-3-5a18bed75887>", line
+        957, in main
+        df, X_analysis, metadata = load_filter_and_prepare_cell_curves()
+        ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+        File
+        "<ipython-input-3-5a18bed75887>", line
+        350, in load_filter_and_prepare_cell_curves
+        nonopto = non_optotagged_mask(df_all, optotag_col)
+        ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^
+        File
+        "<ipython-input-3-5a18bed75887>", line
+        312, in non_optotagged_mask
+        raise ValueError(
+            ValueError: Unrecognized
+        values in optotagging
+        column
+        'allOptotag':
+        allOptotag
+        2
+        379
+        Name: count, dtype: int64
 
+        Add
+        the
+        appropriate
+        values
+        to
+        tagged_values / non_tagged_values, or set
+        OPTOTAG_COLUMN_OVERRIDE if the
+        wrong
+        column
+        was
+        detected.
                 # Overlay dashed unweighted true mean segments
                 raw_sub = df_raw[(df_raw["ablation_mode"] == mode) & (df_raw["input_type"] == inp)]
                 labels = [t.get_text() for t in axes[idx].get_xticklabels()]

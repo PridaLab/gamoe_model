@@ -1,0 +1,16 @@
+{
+  "fold": 9,
+  "seed": 51,
+  "N": 59438,
+  "sizes": {
+    "prior": 7132,
+    "train": 24964,
+    "test_eval": 3567
+  },
+  "fractions": {
+    "umap": 0.4,
+    "prior": 0.12,
+    "train": 0.384,
+    "test_eval": 0.096
+  }
+}
