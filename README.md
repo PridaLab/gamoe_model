@@ -119,7 +119,7 @@ gamoe_model/
 ├── docs/
 │   └── images/                 # Architecture schematics & figures
 └── requirements.txt
-
+```
 ---
 ## Citation
 
@@ -133,7 +133,7 @@ If you use this codebase or model in your research, please cite:
   year = {2026}
 }
 ```
---
+---
 ## Running steps
 
 # 1. Train GAMoE across gate-masking and gate-shuffling
