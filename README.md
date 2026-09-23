@@ -126,6 +126,7 @@ gamoe_model/
 │   └── images/                 # Embedded README figures
 └── requirements.txt
 ```
+
 ---
 ## Citation
 
