@@ -11,9 +11,7 @@ GaMoE provides a framework for factorizing how distinct input sources contribute
 
 ## 🔬 Model Overview
 
-GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. 
-
-Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target data coordinates:
+GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target data coordinates:
 $$\hat{\mathbf{u}}_i = \sum_{j=1}^{N} g_j(\mathbf{u}_i) \cdot f_j(x_{ij})$$
 
 where the gating distribution is normalized across all $N$ experts:
