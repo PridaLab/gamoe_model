@@ -5,7 +5,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-GaMoE provides a framework for factorizing how distinct input sources contribute across the geometry of a complex data space. Here, we apply GaMoE to hippocampal ripples, using cell-type-resolved population activity as experts to evaluate their contribution to their variability. The framework is general and can be adapted to other datasets in which heterogeneous input sources contribute differentially across a structured output space.
+GaMoE provides a framework for factorizing how distinct input sources contribute across the geometry of a complex data space. Here, we apply GaMoE to hippocampal ripples, using cell-type-resolved population activity as experts to evaluate their contribution to their variability. The framework is general and can be adapted to other datasets in which heterogeneous input sources contribute differentially across a structured output space. We first introduce the general method using a synthetic dataset [here], and then apply GaMoE to factorize cell-type contributions to hippocampal ripple variability [here].
 
 ---
 
