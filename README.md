@@ -1,17 +1,17 @@
-# GAMoE: Geometry-Aware Mixture of Experts for Manifold Composition & Feature Attribution
+# GAMoE: Geometry-Aware Mixture of Experts (GaMoE) for cell-type-specific factorization of hippocampal ripples
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PridaLab/gamoe_model/blob/main/notebooks/gamoe_simulated_example.ipynb)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A modular implementation of **Geometry-Aware Mixture of Experts (GAMoE)** for mapping multi-channel continuous features onto low-dimensional manifold geometries under systematic component and subsystem ablation paradigms.
+GaMoE provides a framework for factorizing how distinct input sources contribute across the geometry of a complex data space. Here, we apply GaMoE to hippocampal ripples, using cell-type-resolved population activity as experts to evaluate their contribution to their variability. The framework is general and can be adapted to other datasets in which heterogeneous input sources contribute differentially across a structured output space.
 
 ---
 
 ## 🔬 Model Overview
 
-GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target manifold coordinates:
+GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target data coordinates:
 
 <p align="center">
   <img src="gamoe_ilustration.png" alt="GAMoE Computational Graph" width="85%" />
@@ -27,7 +27,7 @@ $$g_j(\mathbf{u}) \propto \mathcal{N}(\mathbf{u}; \boldsymbol{\mu}_j, \boldsymbo
 
 ## 🧪 Systematic Component Ablation Simulations
 
-To assess how individual inputs or functional modules contribute to manifold reconstruction, ablations are executed **strictly at test time**, keeping the trained expert parameters fixed. GAMoE tests three distinct perturbation mechanisms:
+To assess how individual inputs or functional modules contribute to data reconstruction, ablations are executed **strictly at test time**, keeping the trained expert parameters fixed. GAMoE tests three distinct perturbation mechanisms:
 
 ### 1. Gate Drop / Component Masking (`gate`)
 Completely isolates and disables an expert or subset of experts $\mathcal{A} \subset \{1, \dots, N\}$ by zeroing their gating coefficients and renormalizing the remaining active pathways:
