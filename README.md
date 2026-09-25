@@ -11,18 +11,20 @@ GaMoE provides a framework for factorizing how distinct input sources contribute
 
 ## 🔬 Model Overview
 
-GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target data coordinates:
+GAMoE factorizes complex high-dimensional systems by allocating an independent, constrained bottleneck expert network $f_j(x_j)$ ($1 \to H \to \text{ReLU} \to D$) to each input dimension or functional channel $x_j$. 
 
-<p align="center">
-  <img src="gamoe_ilustration.png" alt="GAMoE Computational Graph" width="85%" />
-</p>
-
+Instead of learning unconstrained gating from raw inputs, experts are dynamically recombined using a **geometry-aware gating function** $g_j(\mathbf{u})$ derived from spatial density priors over the target data coordinates:
 $$\hat{\mathbf{u}}_i = \sum_{j=1}^{N} g_j(\mathbf{u}_i) \cdot f_j(x_{ij})$$
 
 where the gating distribution is normalized across all $N$ experts:
 
 $$g_j(\mathbf{u}) \propto \mathcal{N}(\mathbf{u}; \boldsymbol{\mu}_j, \boldsymbol{\Sigma}_j)^\alpha, \qquad \sum_{j=1}^{N} g_j(\mathbf{u}) = 1$$
 
+In the hippocampal application shown below, individual ripples are represented by their waveforms and embedded into a low-dimensional space using UMAP. Cell-type-specific activity then provides the inputs to the GaMoE experts.
+
+<p align="center">
+  <img src="gamoe_ilustration.png" alt="GAMoE Computational Graph" width="85%" />
+</p>
 ---
 
 ## 🧪 Systematic Component Ablation Simulations
