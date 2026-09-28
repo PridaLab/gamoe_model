@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GAMoE Ablation Explorer</title>
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 20px; background: #f8fafc; color: #1e293b; }
+    .header { margin-bottom: 20px; }
+    .controls { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); align-items: center; }
+    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; background: white; }
+    label { font-size: 13px; font-weight: 600; color: #475569; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h2>🔬 GAMoE: Sharp-Wave Ripple Microcircuit Ablation Explorer</h2>
+    <p>Select an ablation condition and mode to observe ripple manifold degradation in real-time.</p>
+  </div>
+
+  <div class="controls">
+    <div>
+      <label>Ablation Condition:</label><br>
+      <select id="condSelect"></select>
+    </div>
+    <div>
+      <label>Ablation Mode:</label><br>
+      <select id="modeSelect">
+        <option value="gate">Gate Drop</option>
+        <option value="shuffle">Gate Shuffle</option>
+      </select>
+    </div>
+    <div>
+      <label>Color By:</label><br>
+      <select id="colorSelect">
+        <option value="error">Residual Error</option>
+        <option value="freq">Frequency (Hz)</option>
+        <option value="amp">Amplitude (z)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="umapPlot" style="width:100%; height:640px;"></div>
+  </div>
+
+  <script>
+    let rawData = [];
+
+    fetch('data.json')
+      .then(res => res.json())
+      .then(data => {
+        rawData = data.records;
+        const condSelect = document.getElementById('condSelect');
+        data.conditions.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c; opt.innerText = c;
+          condSelect.appendChild(opt);
+        });
+        updatePlot();
+      })
+      .catch(err => console.error("Error loading data.json:", err));
+
+    function updatePlot() {
+      const cond = document.getElementById('condSelect').value;
+      const mode = document.getElementById('modeSelect').value;
+      const colorBy = document.getElementById('colorSelect').value;
+
+      const filtered = rawData.filter(d => d.feature_set === cond && d.ablation_mode === mode);
+      
+      let colorscale = 'Viridis';
+      let cmin = undefined, cmax = undefined;
+
+      if (colorBy === 'error') {
+        colorscale = 'Viridis';
+        cmin = 0; cmax = 3.0; // Fixed manuscript error scale
+      } else if (colorBy === 'freq') {
+        colorscale = 'Coolwarm';
+      } else if (colorBy === 'amp') {
+        colorscale = 'Magma';
+      }
+
+      const trace = {
+        x: filtered.map(d => d.UMAP1_true),
+        y: filtered.map(d => d.UMAP2_true),
+        mode: 'markers',
+        marker: {
+          size: 6,
+          color: filtered.map(d => colorBy === 'error' ? Math.min(d.error, 3.0) : d[colorBy]),
+          colorscale: colorscale,
+          cmin: cmin,
+          cmax: cmax,
+          showscale: true,
+          colorbar: { title: colorBy.toUpperCase() },
+          opacity: 0.75
+        },
+        text: filtered.map(d => `Freq: ${d.freq.toFixed(1)} Hz<br>Amp: ${d.amp.toFixed(2)}<br>Err: ${d.error.toFixed(2)}`),
+        hoverinfo: 'text'
+      };
+
+      const layout = {
+        title: `<b>Ablation:</b> ${cond} (${mode})`,
+        xaxis: { title: 'UMAP 1', showgrid: true, zeroline: false },
+        yaxis: { title: 'UMAP 2', showgrid: true, zeroline: false, scaleanchor: 'x' },
+        margin: { l: 40, r: 40, t: 50, b: 40 }
+      };
+
+      Plotly.react('umapPlot', [trace], layout, {responsive: true});
+    }
+
+    document.getElementById('condSelect').addEventListener('change', updatePlot);
+    document.getElementById('modeSelect').addEventListener('change', updatePlot);
+    document.getElementById('colorSelect').addEventListener('change', updatePlot);
+  </script>
+</body>
+</html>
