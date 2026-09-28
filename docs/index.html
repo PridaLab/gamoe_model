@@ -2,116 +2,361 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>GAMoE Ablation Explorer</title>
+  <title>GAMoE Manifold & Ablation Explorer</title>
   <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 20px; background: #f8fafc; color: #1e293b; }
-    .header { margin-bottom: 20px; }
-    .controls { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); align-items: center; }
-    .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-    select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 14px; background: white; }
-    label { font-size: 13px; font-weight: 600; color: #475569; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 15px 25px;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+    header { margin-bottom: 12px; }
+    h2 { margin: 0 0 6px 0; font-size: 22px; color: #1e293b; }
+    p { margin: 0; color: #64748b; font-size: 13.5px; }
+
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      background: #ffffff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      margin-bottom: 15px;
+    }
+    .ctrl-group { display: flex; flex-direction: column; gap: 4px; }
+    label { font-size: 11.5px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.4px; }
+    select {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 13.5px;
+      background: white;
+      outline: none;
+      cursor: pointer;
+    }
+    select:focus { border-color: #3b82f6; }
+
+    .stat-badge {
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 18px;
+    }
+    .card {
+      background: white;
+      padding: 14px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .card-header {
+      font-weight: 700;
+      font-size: 14px;
+      color: #334155;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    #umapCloudPlot, #eventZoomPlot {
+      width: 100%;
+      height: 580px;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h2>🔬 GAMoE: Sharp-Wave Ripple Microcircuit Ablation Explorer</h2>
-    <p>Select an ablation condition and mode to observe ripple manifold degradation in real-time.</p>
-  </div>
 
-  <div class="controls">
-    <div>
-      <label>Ablation Condition:</label><br>
+  <header>
+    <h2>🔬 GAMoE: Sharp-Wave Ripple Microcircuit Ablation Explorer</h2>
+    <p>Click on any point in the true manifold to inspect event-level shifts under microcircuit ablations.</p>
+  </header>
+
+  <div class="control-panel">
+    <div class="ctrl-group">
+      <label>Ablation Condition</label>
       <select id="condSelect"></select>
     </div>
-    <div>
-      <label>Ablation Mode:</label><br>
+
+    <div class="ctrl-group">
+      <label>Ablation Mode</label>
       <select id="modeSelect">
-        <option value="gate">Gate Drop</option>
-        <option value="shuffle">Gate Shuffle</option>
+        <option value="gate">Gate Drop (Masking)</option>
+        <option value="shuffle">Gate Shuffle (Permutation)</option>
       </select>
     </div>
-    <div>
-      <label>Color By:</label><br>
+
+    <div class="ctrl-group">
+      <label>Color Manifold By</label>
       <select id="colorSelect">
-        <option value="error">Residual Error</option>
         <option value="freq">Frequency (Hz)</option>
         <option value="amp">Amplitude (z)</option>
+        <option value="err">Ablation Residual Error</option>
       </select>
     </div>
+
+    <div class="stat-badge" id="eventBadge">Loading data...</div>
   </div>
 
-  <div class="card">
-    <div id="umapPlot" style="width:100%; height:640px;"></div>
+  <div class="main-grid">
+    <!-- Panel 1: True Manifold Cloud -->
+    <div class="card">
+      <div class="card-header">
+        <span>📍 True Manifold Coordinates (UMAP 1 vs UMAP 2)</span>
+        <span style="font-size: 11.5px; color: #64748b; font-weight: normal;">Click any point to inspect</span>
+      </div>
+      <div id="umapCloudPlot"></div>
+    </div>
+
+    <!-- Panel 2: Single-Ripple Ablation Vector Shift -->
+    <div class="card">
+      <div class="card-header">
+        <span>⚡ Event Deconstruction & Ablation Shift</span>
+        <span id="shiftMetric" style="font-size: 12px; color: #b91c1c; font-weight: bold;"></span>
+      </div>
+      <div id="eventZoomPlot"></div>
+    </div>
   </div>
 
   <script>
-    let rawData = [];
+    let appData = null;
+    let selectedRippleIdx = 0;
 
     fetch('data.json')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        return res.json();
+      })
       .then(data => {
-        rawData = data.records;
+        appData = data;
         const condSelect = document.getElementById('condSelect');
+        condSelect.innerHTML = '';
+        
         data.conditions.forEach(c => {
           const opt = document.createElement('option');
           opt.value = c; opt.innerText = c;
+          if (c === 'No_PV') opt.selected = true;
           condSelect.appendChild(opt);
         });
-        updatePlot();
-      })
-      .catch(err => console.error("Error loading data.json:", err));
 
-    function updatePlot() {
+        // Safe initial selected index
+        selectedRippleIdx = 0;
+        
+        renderAll();
+      })
+      .catch(err => {
+        console.error("Error loading data.json:", err);
+        document.getElementById('eventBadge').innerText = "Failed to load data.json: " + err.message;
+      });
+
+    function getAblationRecords(cond, mode) {
+      if (!appData || !appData.ablations) return null;
+      if (appData.ablations[cond] && appData.ablations[cond][mode]) {
+        return appData.ablations[cond][mode];
+      }
+      return null;
+    }
+
+    function renderAll() {
+      try {
+        drawMainCloud();
+        drawEventZoom();
+      } catch (e) {
+        console.error("Render error:", e);
+        document.getElementById('shiftMetric').innerText = "Render error: " + e.message;
+      }
+    }
+
+    function drawMainCloud() {
+      if (!appData || !appData.ripples || appData.ripples.length === 0) return;
+
       const cond = document.getElementById('condSelect').value;
       const mode = document.getElementById('modeSelect').value;
       const colorBy = document.getElementById('colorSelect').value;
 
-      const filtered = rawData.filter(d => d.feature_set === cond && d.ablation_mode === mode);
-      
-      let colorscale = 'Viridis';
-      let cmin = undefined, cmax = undefined;
+      const ripples = appData.ripples;
+      const ablRecords = getAblationRecords(cond, mode);
 
-      if (colorBy === 'error') {
-        colorscale = 'Viridis';
-        cmin = 0; cmax = 3.0; // Fixed manuscript error scale
-      } else if (colorBy === 'freq') {
+      let colorValues = [];
+      let colorscale = 'Viridis';
+      let cbarTitle = 'Freq (Hz)';
+
+      if (colorBy === 'freq') {
+        colorValues = ripples.map(r => Number(r.freq) || 0);
         colorscale = 'Coolwarm';
+        cbarTitle = 'Freq (Hz)';
       } else if (colorBy === 'amp') {
+        colorValues = ripples.map(r => Number(r.amp) || 0);
         colorscale = 'Magma';
+        cbarTitle = 'Amp (z)';
+      } else {
+        if (ablRecords) {
+          colorValues = ablRecords.map(a => Math.min(Number(a.err) || 0, 3.0));
+        } else {
+          colorValues = ripples.map(r => Math.min(Number(r.err_full) || 0, 3.0));
+        }
+        colorscale = 'Viridis';
+        cbarTitle = 'Error';
       }
 
-      const trace = {
-        x: filtered.map(d => d.UMAP1_true),
-        y: filtered.map(d => d.UMAP2_true),
+      const tracePoints = {
+        x: ripples.map(r => r.u1_true),
+        y: ripples.map(r => r.u2_true),
         mode: 'markers',
+        type: 'scatter',
         marker: {
           size: 6,
-          color: filtered.map(d => colorBy === 'error' ? Math.min(d.error, 3.0) : d[colorBy]),
+          color: colorValues,
           colorscale: colorscale,
-          cmin: cmin,
-          cmax: cmax,
           showscale: true,
-          colorbar: { title: colorBy.toUpperCase() },
-          opacity: 0.75
+          colorbar: { title: cbarTitle, len: 0.8 },
+          opacity: 0.65
         },
-        text: filtered.map(d => `Freq: ${d.freq.toFixed(1)} Hz<br>Amp: ${d.amp.toFixed(2)}<br>Err: ${d.error.toFixed(2)}`),
+        text: ripples.map((r, i) => {
+          const errVal = (ablRecords && ablRecords[i]) ? Number(ablRecords[i].err).toFixed(2) : Number(r.err_full).toFixed(2);
+          return `Ripple #${r.id}<br>Freq: ${Number(r.freq).toFixed(1)} Hz<br>Amp: ${Number(r.amp).toFixed(2)} z<br>Error: ${errVal}`;
+        }),
         hoverinfo: 'text'
       };
 
-      const layout = {
-        title: `<b>Ablation:</b> ${cond} (${mode})`,
-        xaxis: { title: 'UMAP 1', showgrid: true, zeroline: false },
-        yaxis: { title: 'UMAP 2', showgrid: true, zeroline: false, scaleanchor: 'x' },
-        margin: { l: 40, r: 40, t: 50, b: 40 }
+      const sel = ripples[selectedRippleIdx] || ripples[0];
+      const traceSelected = {
+        x: [sel.u1_true],
+        y: [sel.u2_true],
+        mode: 'markers',
+        type: 'scatter',
+        marker: {
+          size: 15,
+          color: 'rgba(255, 230, 0, 0.95)',
+          symbol: 'circle-open',
+          line: { width: 3, color: '#000000' }
+        },
+        hoverinfo: 'none',
+        showlegend: false
       };
 
-      Plotly.react('umapPlot', [trace], layout, {responsive: true});
+      const layout = {
+        xaxis: { title: 'UMAP 1 (True)', showgrid: true, zeroline: false },
+        yaxis: { title: 'UMAP 2 (True)', showgrid: true, zeroline: false, scaleanchor: 'x' },
+        margin: { l: 45, r: 20, t: 15, b: 40 },
+        hovermode: 'closest'
+      };
+
+      Plotly.react('umapCloudPlot', [tracePoints, traceSelected], layout, {responsive: true});
+
+      const plotDiv = document.getElementById('umapCloudPlot');
+      plotDiv.removeAllListeners && plotDiv.removeAllListeners('plotly_click');
+      plotDiv.on('plotly_click', data => {
+        if (data && data.points && data.points.length > 0) {
+          selectedRippleIdx = data.points[0].pointIndex;
+          renderAll();
+        }
+      });
     }
 
-    document.getElementById('condSelect').addEventListener('change', updatePlot);
-    document.getElementById('modeSelect').addEventListener('change', updatePlot);
-    document.getElementById('colorSelect').addEventListener('change', updatePlot);
+    function drawEventZoom() {
+      if (!appData || !appData.ripples || appData.ripples.length === 0) return;
+
+      const cond = document.getElementById('condSelect').value;
+      const mode = document.getElementById('modeSelect').value;
+      const sel = appData.ripples[selectedRippleIdx] || appData.ripples[0];
+      const ablRecords = getAblationRecords(cond, mode);
+
+      document.getElementById('eventBadge').innerText = `Selected: Ripple #${sel.id} (f: ${Number(sel.freq).toFixed(1)} Hz, a: ${Number(sel.amp).toFixed(2)} z)`;
+
+      const u1_true = Number(sel.u1_true);
+      const u2_true = Number(sel.u2_true);
+      const u1_full = Number(sel.u1_pred_full);
+      const u2_full = Number(sel.u2_pred_full);
+
+      let u1_abl = u1_full;
+      let u2_abl = u2_full;
+      let err_abl = Number(sel.err_full);
+
+      if (ablRecords && ablRecords[selectedRippleIdx]) {
+        u1_abl = Number(ablRecords[selectedRippleIdx].u1_pred);
+        u2_abl = Number(ablRecords[selectedRippleIdx].u2_pred);
+        err_abl = Number(ablRecords[selectedRippleIdx].err);
+      }
+
+      const shift = Math.sqrt(Math.pow(u1_full - u1_abl, 2) + Math.pow(u2_full - u2_abl, 2));
+      document.getElementById('shiftMetric').innerText = `Ablation Drift: ${shift.toFixed(3)} UMAP units`;
+
+      const traceBg = {
+        x: appData.ripples.map(r => r.u1_true),
+        y: appData.ripples.map(r => r.u2_true),
+        mode: 'markers',
+        type: 'scatter',
+        marker: { size: 4, color: '#e2e8f0', opacity: 0.5 },
+        hoverinfo: 'none',
+        showlegend: false
+      };
+
+      const traceTrue = {
+        x: [u1_true],
+        y: [u2_true],
+        mode: 'markers',
+        type: 'scatter',
+        marker: { size: 14, color: '#facc15', symbol: 'star', line: { width: 1.2, color: '#000000' } },
+        name: 'True Coordinate'
+      };
+
+      const traceFull = {
+        x: [u1_full],
+        y: [u2_full],
+        mode: 'markers',
+        type: 'scatter',
+        marker: { size: 11, color: '#1e40af', line: { width: 1, color: '#ffffff' } },
+        name: `Full Model (Err: ${Number(sel.err_full).toFixed(2)})`
+      };
+
+      const traceAbl = {
+        x: [u1_abl],
+        y: [u2_abl],
+        mode: 'markers',
+        type: 'scatter',
+        marker: { size: 12, color: '#dc2626', symbol: 'x', line: { width: 1.5, color: '#000000' } },
+        name: `Ablated: ${cond} (Err: ${err_abl.toFixed(2)})`
+      };
+
+      const layoutZoom = {
+        xaxis: { title: 'UMAP 1', showgrid: true, zeroline: false },
+        yaxis: { title: 'UMAP 2', showgrid: true, zeroline: false, scaleanchor: 'x' },
+        margin: { l: 45, r: 20, t: 15, b: 40 },
+        legend: { orientation: 'h', y: -0.18, x: 0 },
+        annotations: [
+          {
+            ax: u1_full,
+            ay: u2_full,
+            axref: 'x',
+            ayref: 'y',
+            x: u1_abl,
+            y: u2_abl,
+            xref: 'x',
+            yref: 'y',
+            showarrow: true,
+            arrowhead: 2,
+            arrowsize: 1.4,
+            arrowwidth: 2.2,
+            arrowcolor: '#dc2626'
+          }
+        ]
+      };
+
+      Plotly.react('eventZoomPlot', [traceBg, traceTrue, traceFull, traceAbl], layoutZoom, {responsive: true});
+    }
+
+    document.getElementById('condSelect').addEventListener('change', renderAll);
+    document.getElementById('modeSelect').addEventListener('change', renderAll);
+    document.getElementById('colorSelect').addEventListener('change', drawMainCloud);
   </script>
 </body>
 </html>
