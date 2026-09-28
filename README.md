@@ -7,6 +7,8 @@
 
 GaMoE provides a framework for factorizing how distinct input sources contribute across the geometry of a complex data space. Here, we apply GaMoE to hippocampal ripples, using cell-type-resolved population activity as experts to evaluate their contribution to their variability. The framework is general and can be adapted to other datasets in which heterogeneous input sources contribute differentially across a structured output space. We first introduce the general method using a synthetic dataset (https://github.com/PridaLab/gamoe_model/blob/main/notebooks/gamoe_generic.ipynb), and then apply GaMoE to factorize cell-type contributions to hippocampal ripple variability (https://github.com/PridaLab/gamoe_model/blob/main/notebooks/gamoe_example.ipynb).
 
+An interactive tool for visualization of cell-type contributions manipulations can be found here https://pridalab.github.io/gamoe_model/. 
+
 ---
 
 ## 🔬 Model Overview
