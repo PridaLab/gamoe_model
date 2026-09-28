@@ -5,7 +5,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-GaMoE provides a framework for factorizing how distinct input sources contribute across the geometry of a complex data space. Here, we apply GaMoE to hippocampal ripples, using cell-type-resolved population activity as experts to evaluate their contribution to their variability. The framework is general and can be adapted to other datasets in which heterogeneous input sources contribute differentially across a structured output space. We first introduce the general method using a synthetic dataset, and then apply GaMoE to factorize cell-type contributions to hippocampal ripple variability.
+GaMoE provides a framework for factorizing how distinct input sources contribute across the geometry of a complex data space. Here, we apply GaMoE to hippocampal ripples, using cell-type-resolved population activity as experts to evaluate their contribution to their variability. The framework is general and can be adapted to other datasets in which heterogeneous input sources contribute differentially across a structured output space. We first introduce the general method using a synthetic dataset (https://github.com/PridaLab/gamoe_model/blob/main/notebooks/gamoe_generic.ipynb), and then apply GaMoE to factorize cell-type contributions to hippocampal ripple variability (https://github.com/PridaLab/gamoe_model/blob/main/notebooks/gamoe_example.ipynb).
 
 ---
 
@@ -42,10 +42,14 @@ Randomly permutes the gating values of selected experts across all events, $\{g_
 
 $$g'_{ij} = \text{permute}(\{g_{ij}\}_i), \qquad g''_{ij} = \frac{g'_{ij}}{\sum_{k=1}^N g'_{ik}}$$
 
-This preserves each expert's overall marginal activation distribution while abolishing its spatial alignment with the manifold coordinates. It isolates whether the model depends on **geometry-specific routing** or simply on unaligned capacity.
+This preserves each expert's overall marginal activation distribution while abolishing its spatial alignment with the data coordinates. It isolates whether the model depends on **geometry-specific routing** or simply on unaligned capacity.
 
 ### 3. Input Feature Masking (`input`)
 Directly clamps standardized input channels to zero ($x_{ij} = 0$) while preserving the geometric gating priors.
+
+<p align="center">
+  <img src="ablation.png" alt="Ablation Experiment" width="85%" />
+</p>
 
 ---
 
